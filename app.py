@@ -1,6 +1,8 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from functools import wraps
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_sqlalchemy import SQLAlchemy
 from datetime import date
+from werkzeug.security import check_password_hash, generate_password_hash
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "av-room-development-key"
@@ -35,7 +37,106 @@ class Booking(db.Model):
     status = db.Column(db.String(20), default="Borrowed")
 
 
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(100), unique=True, nullable=False)
+    password_hash = db.Column(db.String(255), nullable=False)
+    role = db.Column(db.String(20), nullable=False, default="student")
+
+
+def login_required(view):
+    @wraps(view)
+    def wrapped_view(*args, **kwargs):
+        if "user_id" not in session:
+            return redirect(url_for("login", next=request.path))
+        return view(*args, **kwargs)
+
+    return wrapped_view
+
+
+def admin_required(view):
+    @wraps(view)
+    def wrapped_view(*args, **kwargs):
+        if "user_id" not in session:
+            return redirect(url_for("login", next=request.path))
+        if session.get("role") != "admin":
+            return "Only administrators can issue or manage equipment!", 403
+        return view(*args, **kwargs)
+
+    return wrapped_view
+
+
+@app.context_processor
+def inject_current_user():
+    user = User.query.get(session["user_id"]) if session.get("user_id") else None
+    return {"current_user": user}
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        email = request.form.get("email", "").strip().lower()
+        password = request.form.get("password", "")
+        user = User.query.filter_by(email=email).first()
+
+        if not user or not check_password_hash(user.password_hash, password):
+            return render_template("login.html", error="Invalid email or password."), 401
+
+        session.clear()
+        session["user_id"] = user.id
+        session["role"] = user.role
+        next_url = request.args.get("next") or url_for("index")
+        return redirect(next_url if next_url.startswith("/") else url_for("index"))
+
+    return render_template("login.html")
+
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for("login"))
+
+
+@app.route("/users", methods=["GET", "POST"])
+@admin_required
+def users():
+    if request.method == "POST":
+        name = request.form.get("name", "").strip()
+        email = request.form.get("email", "").strip().lower()
+        password = request.form.get("password", "")
+        role = request.form.get("role", "student")
+
+        if not name or not email or not password:
+            return render_template("users.html", users=User.query.order_by(User.name).all(), error="Name, Poornima email address, and password are required!"), 400
+
+        if "@" not in email or not email.endswith("@poornima.edu.in"):
+            return render_template("users.html", users=User.query.order_by(User.name).all(), error="Please enter a valid email address ending in @poornima.edu.in!"), 400
+
+        if len(password) < 8:
+            return render_template("users.html", users=User.query.order_by(User.name).all(), error="Password must contain at least 8 characters!"), 400
+
+        if role not in {"admin", "student"}:
+            return render_template("users.html", users=User.query.order_by(User.name).all(), error="Choose a valid user role!"), 400
+
+        if User.query.filter_by(email=email).first():
+            return render_template("users.html", users=User.query.order_by(User.name).all(), error="A user with this email address already exists!"), 400
+
+        db.session.add(User(
+            name=name,
+            email=email,
+            password_hash=generate_password_hash(password),
+            role=role
+        ))
+        db.session.commit()
+        flash(f"{name} was created as a {role} account.", "success")
+        return redirect(url_for("users"))
+
+    return render_template("users.html", users=User.query.order_by(User.name).all())
+
+
 @app.route("/")
+@login_required
 def index():
     equipment = Equipment.query.all()
     bookings = Booking.query.filter_by(status="Borrowed").all()
@@ -55,6 +156,7 @@ def index():
 
 
 @app.route("/book/<int:equipment_id>", methods=["GET", "POST"])
+@admin_required
 def book(equipment_id):
 
     equipment = Equipment.query.get_or_404(equipment_id)
@@ -124,12 +226,14 @@ def book(equipment_id):
 
 
 @app.route("/returns")
+@admin_required
 def returns():
     bookings = Booking.query.filter_by(status="Borrowed").all()
     return render_template("returns.html", bookings=bookings, current_date=date.today())
 
 
 @app.route("/transfer/<int:booking_id>", methods=["POST"])
+@admin_required
 def transfer_booking(booking_id):
     booking = Booking.query.get_or_404(booking_id)
 
@@ -174,6 +278,7 @@ def transfer_booking(booking_id):
 
 
 @app.route("/return/<int:booking_id>", methods=["POST"])
+@admin_required
 def return_equipment(booking_id):
 
     booking = Booking.query.get_or_404(booking_id)
@@ -248,6 +353,23 @@ if __name__ == "__main__":
             ]
 
             db.session.add_all(equipment)
+            db.session.commit()
+
+        if User.query.count() == 0:
+            db.session.add_all([
+                User(
+                    name="AV Room Administrator",
+                    email="admin@poornima.edu.in",
+                    password_hash=generate_password_hash("admin123"),
+                    role="admin"
+                ),
+                User(
+                    name="Student Viewer",
+                    email="student@poornima.edu.in",
+                    password_hash=generate_password_hash("student123"),
+                    role="student"
+                )
+            ])
             db.session.commit()
 
     app.run(host="0.0.0.0", port=5000, debug=True)

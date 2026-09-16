@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Users{% endblock %}
+{% block breadcrumb %}User management{% endblock %}
+{% block content %}
+<div class="page-head"><div><p class="eyebrow">Administrator tools</p><h1>Create a user</h1><p class="lede">Assign a login email and temporary password for students or AV room staff.</p></div><a class="back-link" href="{{ url_for('index') }}"><span>←</span> Back to dashboard</a></div>
+<div class="grid-two">
+    <section class="panel panel-pad">
+        <h2 class="section-title">New account</h2>
+        <p class="section-note">Use the user’s official Poornima email for sign-in. Passwords are stored securely as hashes.</p>
+        {% if error %}<div class="flash error" role="alert">{{ error }}</div>{% endif %}
+        <form method="post">
+            <div class="form-grid">
+                <label class="field full">Full name<input type="text" name="name" required placeholder="e.g. Aisha Sharma"></label>
+                <label class="field full">Poornima email address<input type="email" name="email" required pattern="[A-Za-z0-9._%+-]+@poornima\.edu\.in" title="Use an @poornima.edu.in email address" placeholder="student@poornima.edu.in"><span class="help">This address will be used to sign in.</span></label>
+                <label class="field">Temporary password<input type="password" name="password" minlength="8" required placeholder="At least 8 characters"></label>
+                <label class="field">Role<select name="role"><option value="student">Student</option><option value="admin">Administrator</option></select></label>
+            </div>
+            <div class="form-footer"><span class="fine-print">Share the temporary password securely and ask the user to change it later.</span><button class="button" type="submit">Create account →</button></div>
+        </form>
+    </section>
+    <aside class="panel side-list"><h3>Role permissions</h3><p>Choose the lowest access level needed for each account.</p><div class="rule"></div><div class="fact"><span>Student</span><strong>View availability and due dates</strong></div><div class="fact"><span>Administrator</span><strong>Issue, return, transfer gear</strong></div><div class="rule"></div><div class="notice">All user accounts and equipment bookings must use official @poornima.edu.in email addresses.</div></aside>
+</div>
+<section class="panel panel-pad" style="margin-top:24px"><h2 class="section-title">Existing users</h2><p class="section-note">Accounts currently allowed to sign in.</p><div class="table-wrapper"><table class="booking-table"><thead><tr><th>Name</th><th>Email</th><th>Role</th></tr></thead><tbody>{% for user in users %}<tr><td>{{ user.name }}</td><td>{{ user.email }}</td><td><span class="status {% if user.role == 'admin' %}active{% else %}borrowed-status{% endif %}">{{ user.role|capitalize }}</span></td></tr>{% endfor %}</tbody></table></div></section>
+{% endblock %}

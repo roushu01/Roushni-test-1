@@ -297,8 +297,6 @@
     }
 
 }
-```
-
     </style>
 </head>
 <body>
@@ -308,16 +306,17 @@
 		<div class="rail-label">Workspace</div>
 		<nav class="nav" aria-label="Main navigation">
 			<a href="{{ url_for('index') }}" class="{% if request.endpoint == 'index' %}active{% endif %}"><span class="nav-icon">◈</span>Dashboard</a>
-			<a href="{{ url_for('returns') }}" class="{% if request.endpoint in ['returns', 'return_equipment'] %}active{% endif %}"><span class="nav-icon">↺</span>Returns {% if request.endpoint == 'returns' %}<span class="nav-badge">!</span>{% endif %}</a>
+            {% if current_user and current_user.role == 'admin' %}<a href="{{ url_for('returns') }}" class="{% if request.endpoint in ['returns', 'return_equipment'] %}active{% endif %}"><span class="nav-icon">↺</span>Returns {% if request.endpoint == 'returns' %}<span class="nav-badge">!</span>{% endif %}</a>{% endif %}
+            {% if current_user and current_user.role == 'admin' %}<a href="{{ url_for('users') }}" class="{% if request.endpoint == 'users' %}active{% endif %}"><span class="nav-icon">◎</span>Users</a>{% endif %}
 		</nav>
 		<div class="rail-label">Tools</div>
 		<nav class="nav"><a href="{{ url_for('index') }}#equipment"><span class="nav-icon">▦</span>Inventory</a></nav>
 		<div class="rail-spacer"></div>
 		<div class="desk-status"><span class="status-dot"></span><span><strong>Desk open</strong><small>Mon–Fri · 09:00–17:00</small></span></div>
-		<div class="user"><span class="avatar">AV</span><span><strong>Room manager</strong><small>Media services</small></span></div>
+		<div class="user"><span class="avatar">{% if current_user %}{{ current_user.name[:2]|upper }}{% else %}AV{% endif %}</span><span><strong>{% if current_user %}{{ current_user.name }}{% else %}AV Desk{% endif %}</strong><small>{% if current_user %}{{ current_user.role|capitalize }} account{% else %}Media services{% endif %}</small></span></div>
 	</aside>
 	<main class="workspace">
-		<!-- <header class="topbar"><div class="crumb"><span>Workspace</span><b>/</b><strong>{% block breadcrumb %}AV Desk{% endblock %}</strong></div><nav class="top-links"><a href="{{ url_for('index') }}" class="{% if request.endpoint == 'index' %}current{% endif %}">Dashboard</a><a href="{{ url_for('returns') }}" class="{% if request.endpoint == 'returns' %}current{% endif %}">Returns</a><a href="{{ url_for('index') }}#equipment" class="primary">+ New booking</a></nav></header> -->
+        <header class="topbar"><div class="crumb"><span>Workspace</span><b>/</b><strong>{% block breadcrumb %}AV Desk{% endblock %}</strong></div><nav class="top-links"><a href="{{ url_for('index') }}" class="{% if request.endpoint == 'index' %}current{% endif %}">Dashboard</a>{% if current_user and current_user.role == 'admin' %}<a href="{{ url_for('returns') }}" class="{% if request.endpoint == 'returns' %}current{% endif %}">Returns</a><a href="{{ url_for('index') }}#equipment" class="primary">+ New booking</a>{% endif %}{% if current_user %}<a href="{{ url_for('logout') }}">Sign out</a>{% endif %}</nav></header>
 		<div class="content">
 			{% with messages = get_flashed_messages(with_categories=true) %}
 				{% if messages %}

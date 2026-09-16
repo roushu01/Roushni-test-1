@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sign in | AV Desk</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --ink:#20292a; --muted:#778481; --line:#e5ebe7; --paper:#f6f8f5; --teal:#168f84; --teal-soft:#e3f4f0; --coral:#dc705e; }
+        * { box-sizing:border-box; } body { min-height:100vh; margin:0; display:grid; place-items:center; background:var(--paper); color:var(--ink); font:14px 'DM Sans',sans-serif; }
+        .login-shell { width:min(420px,calc(100% - 32px)); padding:34px; border:1px solid var(--line); border-radius:12px; background:#fff; box-shadow:0 18px 60px rgba(28,55,48,.08); }
+        .brand { display:flex; align-items:center; gap:11px; margin-bottom:34px; }.brand-mark { width:31px; height:31px; display:flex; align-items:end; justify-content:center; gap:3px; padding:8px 6px; border-radius:9px; background:var(--teal); }.brand-mark i { width:4px; border-radius:3px; background:#d8f2ed; }.brand-mark i:nth-child(1){height:8px}.brand-mark i:nth-child(2){height:14px}.brand-mark i:nth-child(3){height:10px}.brand strong { display:block; font:700 19px 'Space Grotesk'; }.brand small { display:block; margin-top:3px; color:#9aa5a1; font-size:10px; }
+        .eyebrow { margin:0 0 10px; color:var(--teal); font-size:10px; font-weight:700; letter-spacing:1.4px; text-transform:uppercase; }.login-shell h1 { margin:0; font:700 28px 'Space Grotesk'; letter-spacing:-.8px; }.intro { margin:9px 0 24px; color:#87928e; font-size:12px; line-height:1.5; }.field { display:block; margin-bottom:16px; color:#66736e; font-size:11px; font-weight:700; }.field input { display:block; width:100%; margin-top:7px; padding:11px 12px; border:1px solid #dfe7e2; border-radius:6px; outline:0; color:#43514c; font:13px 'DM Sans'; }.field input:focus { border-color:var(--teal); box-shadow:0 0 0 3px var(--teal-soft); }.submit { width:100%; padding:12px; border:0; border-radius:6px; color:#fff; background:var(--teal); font-weight:700; cursor:pointer; }.error { padding:11px; margin-bottom:17px; border-radius:6px; color:#a4493b; background:#fff0ec; font-size:11px; }.demo { margin-top:22px; padding-top:16px; border-top:1px solid var(--line); color:#929e99; font-size:10px; line-height:1.6; }.demo strong { color:#596762; }
+    </style>
+</head>
+<body>
+    <main class="login-shell">
+        <div class="brand"><span class="brand-mark"><i></i><i></i><i></i></span><span><strong>AV Desk</strong><small>College media services</small></span></div>
+        <p class="eyebrow">Secure workspace</p>
+        <h1>Sign in to AV Desk</h1>
+        <p class="intro">Students can view live availability and due dates. Administrators can issue and manage equipment.</p>
+        {% if error %}<div class="error" role="alert">{{ error }}</div>{% endif %}
+        <form method="post">
+            <label class="field">Poornima email<input type="email" name="email" required placeholder="you@poornima.edu.in"></label>
+            <label class="field">Password<input type="password" name="password" required></label>
+            <button class="submit" type="submit">Sign in →</button>
+        </form>
+        <div class="demo"><strong>Development accounts</strong><br>Admin: admin@poornima.edu.in / admin123<br>Student: student@poornima.edu.in / student123</div>
+    </main>
+</body>
+</html>

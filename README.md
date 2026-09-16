@@ -48,13 +48,25 @@ Open the application at [http://127.0.0.1:5000](http://127.0.0.1:5000).
 
 The first startup creates the SQLite database and inserts the default equipment when the database has no equipment records. The database is stored at `instance/av_room.db`.
 
+## Authentication and Roles
+
+The application requires sign-in. The development accounts created on first startup are:
+
+| Role | Email | Password | Permissions |
+| --- | --- | --- | --- |
+| Administrator | `admin@poornima.edu.in` | `admin123` | Issue equipment, process returns, and transfer bookings |
+| Student | `student@poornima.edu.in` | `student123` | View inventory availability and booking due dates |
+
+Change these development passwords before deploying the application. Students cannot access the booking, return, or transfer actions.
+
 ## Main Pages
 
 - `/` — dashboard, inventory, availability, and active bookings
 - `/book/<equipment_id>` — create a booking
 - `/returns` — process returns and transfer active bookings
+- `/users` — administrator-only user creation and role management
 
-Bookings require a `@poornima.edu.in` email address. Late returns use a fixed fee of Rs 25 per day. The refund is calculated as the deposit minus the late fee, never below zero.
+Administrators can create student or administrator accounts using an official `@poornima.edu.in` address and assign an initial password. Passwords are stored as secure hashes. Equipment bookings also require a `@poornima.edu.in` borrower email address. Late returns use a fixed fee of Rs 25 per day. The refund is calculated as the deposit minus the late fee, never below zero.
 
 ## Validate the Project
 
@@ -71,6 +83,7 @@ python - <<'PY'
 from app import app
 
 with app.test_client() as client:
+	client.post("/login", data={"email": "admin@poornima.edu.in", "password": "admin123"})
 	for path in ["/", "/returns", "/book/1"]:
 		response = client.get(path)
 		print(path, response.status_code)
