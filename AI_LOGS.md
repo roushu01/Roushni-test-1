@@ -1,79 +1,101 @@
-# AI Prompt Log
+# AI Request Log
 
-This file records the user requests made during this project conversation, in chronological order.
+This document records the user requirements and change requests made during the development of the College AV Room Gear Tracker. Requests are rewritten for clarity while preserving their original intent.
 
-## 1. Initial Project Request
+## 1. Define the AV Room Lending System
 
-> The college AV room
->
-> The college AV room lends out gear - DSLR cameras, projectors, mics, tripods - and popular items have several units. Today it's a paper register nobody keeps up to date, so kit goes missing and two clubs show up for the same projector. Students keep asking 'is a DSLR free this weekend?' and no one can say. Borrowers hang on to things far too long, so a sensible return date and a small per-day late fee would help, and a refundable deposit keeps people honest - returned minus any late fee. And one person shouldn't be able to book out half the room at once.
->
-> Build something to track the gear and nudge people to return it.
+Design and build an application for a college AV room that lends DSLR cameras, projectors, microphones, tripods, and other equipment. The application should:
 
-## 2. Template Design
+- Track multiple units of popular equipment.
+- Show current availability so students can determine whether equipment is free.
+- Prevent conflicting bookings for the same equipment.
+- Record borrowers and booking dates.
+- Support sensible return dates.
+- Apply a per-day late fee.
+- Hold a refundable deposit and calculate the refund as the deposit minus applicable late fees.
+- Prevent a single borrower from reserving an excessive amount of equipment.
+- Help staff monitor and encourage timely returns.
 
-> design the book.html, base.html and returns.html according to the app.py
+## 2. Design the Flask Templates
 
-## 3. Deposit Explanation
+Create and style `book.html`, `base.html`, and `returns.html` according to the routes, models, and data provided by `app.py`.
 
-> why you imeplement feature of refundable deposit
+## 3. Explain the Refundable Deposit
 
-## 4. Deposit Fix
+Explain the purpose of the refundable deposit feature and how it supports responsible equipment returns.
 
-> i want fix refundable deposite
+## 4. Fix the Refundable Deposit Workflow
 
-## 5. Current Date Context
+Review and correct the refundable deposit implementation so that deposits are collected during booking and refunds are calculated correctly when equipment is returned.
 
-> showing current_date is not add a variable that will fetch current date
+## 5. Provide the Current Date to Templates
 
-## 6. Booking Date Validation
+Add a backend variable that provides the current date to the templates so overdue bookings can be identified reliably.
 
-> the date at which book is booked it should not less than the current date
+## 6. Validate Booking Dates
 
-## 7. Reasoning Documentation
+Ensure that a booking date cannot be earlier than the current date. The validation should work in both the browser form and the Flask backend.
 
-> in my reasoning file write the thought process
+## 7. Document the Implementation Rationale
 
-## 8. Concurrent Booking Question
+Create a structured reasoning document that explains the project requirements, implementation decisions, data model, validation rules, and possible future improvements.
 
-> in this software if there is 5 DSLR available and 10 user try to book the dslr at the same time how will the software process it
+## 8. Analyze Simultaneous Booking Requests
 
-## 9. Concurrent Booking Fix
+Explain how the system should behave when five DSLR cameras are available and ten users attempt to book them at the same time.
 
-> if all the users try to book the equipment at the same which five users request will be processed and how and make my software to handle this issue also
+## 9. Prevent Concurrent Overbooking
 
-## 10. Fixed Late Fee
+Implement concurrency protection so that when five DSLR units are available, exactly five valid booking requests can succeed and remaining requests are rejected without creating overbookings.
 
-> i want the late free should be fixed and it should be charge per day like 25rs per day
+## 10. Use a Fixed Daily Late Fee
 
-## 11. Borrower Transfer Feature
+Set the late fee to a fixed rate of Rs 25 per overdue day and use the same rate consistently in calculations, forms, messages, and equipment defaults.
 
-> i want an addition feature that one borrower can lend the book to the another borrower without affecting the availability and if it is booked by another person before due date the current borrower should not face any fine
+## 11. Add Borrower-to-Borrower Booking Transfers
 
-## 12. Transfer Due Date
+Allow an active borrower to transfer their booking to another borrower without changing equipment availability. If the transfer occurs before the due date, the original borrower should not receive a late fee.
 
-> during transfer booking the borrower can also edit the due date according to him
+## 12. Allow Due-Date Changes During Transfers
 
-## 13. College Email Restriction
+Allow the incoming borrower to choose a new due date while transferring a booking. Validate the new date and use it for future overdue and late-fee calculations.
 
-> the email through which student book equipment include @poornima.edu.in
+## 13. Restrict Student Email Addresses
 
-## 14. Dashboard Frontend Improvement
+Require borrowers to use an official email address ending in `@poornima.edu.in` when booking or receiving a transferred booking. Apply the restriction in both the browser and backend validation.
 
-> improve the frontend of index.html according to the other pages
+## 14. Improve the Dashboard Frontend
 
-## 15. Restore Previous Dashboard
+Improve the frontend of `index.html` so that it follows the visual style and layout conventions used by the other application pages.
 
-> bring the code of previous index.html
+## 15. Restore the Previous Dashboard
 
-## 16. Borrowed Equipment Search
+Restore the earlier Bootstrap-based version of `index.html`, including its dashboard cards, equipment cards, availability controls, borrowing table, overdue styling, and equipment search.
 
-> implement search feature in boroowed equipment by student name,equipment name or borrowed date
+## 16. Search Current Borrowings
 
-## 17. Project Documentation
+Add a search feature for active borrowed equipment. The search must support:
 
-> in README.md write instruction for project setup ,running and debugging
+- Student name.
+- Equipment name.
+- Borrowed date.
 
-## 18. AI Prompt Log
+## 17. Document Project Setup and Debugging
 
-> create AI_LOGS.md file write all the prompt that i have given you
+Update `README.md` with professional instructions for:
+
+- Installing project dependencies.
+- Creating and activating a virtual environment.
+- Running the Flask application.
+- Accessing the application locally.
+- Understanding database initialization.
+- Validating the application.
+- Debugging with VS Code and `pdb`.
+
+## 18. Create an AI Request Log
+
+Create `AI_LOGS.md` and record all user requests made during the project conversation.
+
+## 19. Improve the AI Request Log
+
+Rewrite the recorded requests in a structured and professional format while preserving their meaning and chronological order.
