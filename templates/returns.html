@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Returns{% endblock %}
+{% block breadcrumb %}Returns desk{% endblock %}
+{% block content %}
+{% set overdue_count = bookings|selectattr('due_date', 'lt', current_date if current_date is defined else none)|list|length %}
+<div class="page-head"><div><p class="eyebrow">Close the loop</p><h1>Returns desk</h1><p class="lede">Check in borrowed gear, calculate late fees, and release the deposit back to the borrower.</p></div><a class="back-link" href="{{ url_for('index') }}"><span>←</span> Back to dashboard</a></div>
+<div class="return-summary"><div class="summary-card active"><span>Currently out</span><strong>{{ bookings|length }}</strong></div><div class="summary-card overdue"><span>Needs attention</span><strong>{{ overdue_count }}</strong></div><div class="summary-card deposit"><span>Deposits held</span><strong>Active</strong></div></div>
+<section class="panel">
+	<div class="panel-pad" style="padding-bottom:8px"><h2 class="section-title">Open borrowings</h2><p class="section-note">Returns are processed with today’s date. Late fees use the item’s daily rate.</p></div>
+	{% if bookings %}
+		{% for booking in bookings %}
+		{% set is_overdue = current_date is defined and booking.due_date < current_date %}
+		<article class="return-row {% if is_overdue %}overdue{% endif %}"><div class="borrower"><span class="avatar">AV</span><span><strong>{{ booking.student_name }}</strong><small>{{ booking.email or 'No email supplied' }}</small></span></div><div><span class="data-label">Equipment</span><span class="data-value">Item #{{ booking.equipment_id }} · {{ booking.quantity }} unit{% if booking.quantity != 1 %}s{% endif %}</span></div><div><span class="data-label">Borrowed</span><span class="data-value">{{ booking.borrow_date.strftime('%d %b %Y') }}</span></div><div><span class="data-label">Due date</span><span class="data-value {% if is_overdue %}late{% else %}on-time{% endif %}">{{ booking.due_date.strftime('%d %b %Y') }}{% if is_overdue %} · overdue{% endif %}</span></div><form class="return-action" action="{{ url_for('return_equipment', booking_id=booking.id) }}" method="post"><button class="button {% if is_overdue %}danger{% else %}secondary{% endif %}" type="submit">Mark returned</button></form><form class="transfer-form" action="{{ url_for('transfer_booking', booking_id=booking.id) }}" method="post"><span class="transfer-label">Transfer before due date</span><input name="student_name" required placeholder="New borrower name"><input name="email" type="email" required pattern="[A-Za-z0-9._%+-]+@poornima\.edu\.in" title="Use an @poornima.edu.in email address" placeholder="new@poornima.edu.in"><label class="transfer-date">New due date<input name="due_date" type="date" min="{{ current_date.isoformat() }}" value="{{ booking.due_date.isoformat() }}" required></label><button class="button secondary" type="submit">Transfer booking</button></form></article>
+		{% endfor %}
+	{% else %}<div class="empty"><strong>Nothing waiting to come back</strong>All equipment is currently checked in.</div>{% endif %}
+</section>
+{% endblock %}

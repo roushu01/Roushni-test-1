@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Book equipment{% endblock %}
+{% block breadcrumb %}New booking{% endblock %}
+{% block content %}
+<div class="page-head">
+    <div><p class="eyebrow">Equipment checkout</p><h1>Make a booking</h1><p class="lede">Reserve a piece of AV gear for a class, club, or personal project. A refundable deposit is held until everything comes back.</p></div>
+    <a class="back-link" href="{{ url_for('index') }}"><span>←</span> Back to dashboard</a>
+</div>
+<div class="grid-two">
+    <section class="panel panel-pad">
+        <div class="item-banner"><div class="gear-icon">{% if 'DSLR' in equipment.name %}▣{% elif 'Projector' in equipment.name %}▰{% elif 'Microphone' in equipment.name %}♬{% else %}⊞{% endif %}</div><div><h2>{{ equipment.name }}</h2><p>{{ equipment.total_quantity }} units in the AV room</p></div><div class="available">{{ equipment.available_quantity }} available<small>of {{ equipment.total_quantity }} total</small></div></div>
+        <form action="{{ url_for('book', equipment_id=equipment.id) }}" method="post">
+            <div class="form-grid">
+                <label class="field">Borrower name<input type="text" name="student_name" required placeholder="e.g. Sam Taylor"><span class="help">Use the name on the student ID.</span></label>
+                <label class="field">College email address<input type="email" name="email" required pattern="[A-Za-z0-9._%+-]+@poornima\.edu\.in" title="Use your @poornima.edu.in email address" placeholder="student@poornima.edu.in"><span class="help">Use your official @poornima.edu.in address.</span></label>
+                <label class="field">Quantity<input type="number" name="quantity" min="1" max="{{ equipment.available_quantity }}" value="1" required></label>
+                <label class="field">Refundable deposit<input type="number" name="deposit" min="0" step="0.01" value="{{ '%.2f'|format(late_fee_per_day) }}" required><span class="help">Returned minus any late fee.</span></label>
+                <label class="field">Borrow date<input type="date" name="borrow_date" min="{{ current_date.isoformat() }}" value="{{ current_date.isoformat() }}" required><span class="help">Bookings cannot start before today.</span></label>
+                <label class="field">Return date<input type="date" name="due_date" min="{{ current_date.isoformat() }}" required></label>
+            </div>
+            <div class="fee-box">Late returns are charged at <strong>Rs {{ '%.2f'|format(late_fee_per_day) }} per day</strong>. The final refund is calculated automatically when the gear is returned.</div>
+            <div class="form-footer"><span class="fine-print">Please check the gear with the desk team before leaving.</span><button class="button" type="submit">Confirm booking →</button></div>
+        </form>
+    </section>
+    <aside class="panel side-list"><h3>Before you take it</h3><p>A quick handover keeps the next booking on time.</p><div class="rule"></div><div class="fact"><span>Availability</span><strong>{{ equipment.available_quantity }} of {{ equipment.total_quantity }} units</strong></div><div class="fact"><span>Late fee</span><strong>Rs {{ '%.2f'|format(late_fee_per_day) }} / day</strong></div><div class="fact"><span>Deposit</span><strong>Refundable</strong></div><div class="rule"></div><div class="notice">Choose a sensible return date. Another student may already be waiting for this kit.</div></aside>
+</div>
+{% endblock %}
